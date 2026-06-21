@@ -29,14 +29,28 @@ type NetworkData = {
   readAt: number;
 };
 
+type Transfer = {
+  blockNumber: number;
+  txHash: string;
+  contract: string;
+  direction: "in" | "out";
+  counterparty: string;
+  type: "ERC-20" | "ERC-721";
+};
 type WalletData = {
   ok: true;
   address: string;
   chain: string;
+  chainId: number;
+  accountType: "EOA" | "Contract";
   balance: string;
   symbol: string;
   txCount: number;
   blockNumber: number;
+  windowBlocks: number;
+  transfers: Transfer[];
+  tokenContractsSeen: string[];
+  nftContractsSeen: string[];
   timestamp: number;
 };
 
@@ -420,40 +434,131 @@ function WalletTab() {
             </span>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-3 stagger">
-            <div className="surface rounded-3xl p-4 animate-fade-up hover-lift">
-              <div className="text-[22px] font-extrabold text-brand tracking-tightest leading-none">
-                {data.txCount > 0 ? "Active" : "Dormant"}
+          <div className="mt-4 grid grid-cols-3 gap-2.5 stagger">
+            <div className="surface rounded-3xl p-3.5 animate-fade-up hover-lift">
+              <div className="text-[18px] font-extrabold text-brand tracking-tightest leading-none">
+                {data.accountType}
               </div>
-              <div className="text-[12px] text-ink font-bold mt-2.5">Wallet Status</div>
-              <div className="text-[10px] text-muted font-medium mt-1">
-                {data.txCount > 0 ? `${data.txCount} on-chain actions` : "No outbound txs yet"}
+              <div className="text-[11px] text-ink font-bold mt-2.5 leading-tight">Type</div>
+              <div className="text-[9px] text-muted font-medium mt-0.5 leading-tight">
+                {data.accountType === "EOA" ? "wallet" : "contract"}
               </div>
             </div>
-            <div className="surface rounded-3xl p-4 animate-fade-up hover-lift">
-              <div className="text-[22px] font-extrabold text-brand tracking-tightest leading-none">
-                #{data.blockNumber.toLocaleString()}
+            <div className="surface rounded-3xl p-3.5 animate-fade-up hover-lift">
+              <div className="text-[18px] font-extrabold text-brand tracking-tightest leading-none">
+                {data.txCount > 0 ? "Active" : "Dormant"}
               </div>
-              <div className="text-[12px] text-ink font-bold mt-2.5">Current Block</div>
-              <div className="text-[10px] text-muted font-medium mt-1">
-                Read {new Date(data.timestamp).toLocaleTimeString()}
+              <div className="text-[11px] text-ink font-bold mt-2.5 leading-tight">Status</div>
+              <div className="text-[9px] text-muted font-medium mt-0.5 leading-tight">
+                {data.txCount > 0 ? `${data.txCount} txs sent` : "no outbound"}
+              </div>
+            </div>
+            <div className="surface rounded-3xl p-3.5 animate-fade-up hover-lift">
+              <div className="text-[18px] font-extrabold text-brand tracking-tightest leading-none font-mono">
+                #{data.blockNumber.toString().slice(-6)}
+              </div>
+              <div className="text-[11px] text-ink font-bold mt-2.5 leading-tight">Head Block</div>
+              <div className="text-[9px] text-muted font-medium mt-0.5 leading-tight">
+                {new Date(data.timestamp).toLocaleTimeString().slice(0, 5)}
               </div>
             </div>
           </div>
 
-          <div className="mt-8 animate-fade-up">
-            <span className="eyebrow">Deep Dive</span>
-            <h2 className="text-[20px] font-extrabold tracking-tightest text-ink mt-2.5 mb-4 leading-none">Scanners</h2>
+          {/* Holdings (token + NFT contracts touched) */}
+          <div className="mt-6 grid grid-cols-2 gap-3 stagger">
+            <div className="surface rounded-3xl p-4 animate-fade-up hover-lift">
+              <div className="text-[24px] font-extrabold text-brand tracking-tightest leading-none">
+                {data.tokenContractsSeen.length}
+              </div>
+              <div className="text-[11px] text-ink font-bold mt-2.5">Token Contracts</div>
+              <div className="text-[9px] text-muted font-medium mt-1 leading-snug">
+                ERC-20 contracts touched in last {(data.windowBlocks / 1000).toFixed(0)}K blocks
+              </div>
+            </div>
+            <div className="surface rounded-3xl p-4 animate-fade-up hover-lift">
+              <div className="text-[24px] font-extrabold text-brand tracking-tightest leading-none">
+                {data.nftContractsSeen.length}
+              </div>
+              <div className="text-[11px] text-ink font-bold mt-2.5">NFT Collections</div>
+              <div className="text-[9px] text-muted font-medium mt-1 leading-snug">
+                ERC-721 contracts in scanned window
+              </div>
+            </div>
+          </div>
+
+          {/* Recent transfers */}
+          <div className="mt-7 animate-fade-up">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <span className="eyebrow">On-Chain</span>
+                <h2 className="text-[18px] font-extrabold tracking-tightest text-ink mt-2.5 leading-none">
+                  Recent Transfers
+                </h2>
+              </div>
+              <span className="text-[10px] text-muted font-semibold">
+                last {(data.windowBlocks / 1000).toFixed(0)}K blocks
+              </span>
+            </div>
+            {data.transfers.length === 0 ? (
+              <div className="surface rounded-3xl p-5 text-center">
+                <div className="text-[13px] font-bold text-ink">No token / NFT activity</div>
+                <div className="text-[11px] text-muted mt-1 font-medium">
+                  No ERC-20 or ERC-721 transfers in the scanned window.
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 stagger">
+                {data.transfers.slice(0, 10).map((t, i) => (
+                  <a
+                    key={i}
+                    href={`https://chainscan.0g.ai/tx/${t.txHash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover-lift surface rounded-2xl px-4 py-3 flex items-center gap-3 animate-fade-up"
+                  >
+                    <span
+                      className="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full text-white flex-shrink-0"
+                      style={{ background: t.direction === "in" ? "#2a9050" : "var(--brand)" }}
+                    >
+                      {t.direction}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[12px] font-bold text-ink tracking-tight">
+                        {t.type} · {shortAddr(t.contract)}
+                      </div>
+                      <div className="text-[10px] text-muted font-medium font-mono mt-0.5 truncate">
+                        {t.direction === "in" ? "from" : "to"} {shortAddr(t.counterparty)} · #{t.blockNumber.toLocaleString()}
+                      </div>
+                    </div>
+                    <span className="w-7 h-7 rounded-full bg-brand-tint flex items-center justify-center text-brand flex-shrink-0">
+                      <Icon name="arrow-up-right" size={12} strokeWidth={2.1} />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Scanner deep-links — staking & full history live here */}
+          <div className="mt-7 animate-fade-up">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <span className="eyebrow">Deep Dive</span>
+                <h2 className="text-[18px] font-extrabold tracking-tightest text-ink mt-2.5 leading-none">
+                  Full History & Staking
+                </h2>
+              </div>
+            </div>
             <div className="flex flex-col gap-2.5 stagger">
               {[
-                { title: "Chain Scan", sub: "Full transaction history", href: `https://chainscan.0g.ai/address/${data.address}` },
+                { title: "Chain Scan", sub: "Complete tx history & token balances", href: `https://chainscan.0g.ai/address/${data.address}` },
+                { title: "0G Explorer", sub: "Validator stake & delegations", href: `https://explorer.0g.ai/address/${data.address}` },
                 { title: "Storage Scan", sub: "Data uploaded by this wallet", href: `https://storagescan.0g.ai/address/${data.address}` },
-                { title: "0G Explorer", sub: "Validator & staking info", href: `https://explorer.0g.ai/address/${data.address}` },
               ].map((s) => (
                 <a key={s.title} href={s.href} target="_blank" rel="noreferrer"
                   className="hover-lift surface rounded-3xl px-5 py-4 flex items-center gap-3 animate-fade-up">
                   <div className="flex-1 min-w-0">
-                    <div className="text-[15px] font-bold text-ink tracking-tight">{s.title}</div>
+                    <div className="text-[14px] font-bold text-ink tracking-tight">{s.title}</div>
                     <div className="text-[11px] text-muted mt-0.5 font-medium">{s.sub}</div>
                   </div>
                   <span className="w-8 h-8 rounded-full bg-brand-tint flex items-center justify-center text-brand flex-shrink-0">

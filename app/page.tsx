@@ -47,16 +47,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-[100dvh] flex flex-col px-6 pt-14 pb-9 bg-white">
-      <div className="flex justify-between items-center animate-fade-in">
-        <div className="text-sm font-extrabold tracking-tight text-ink">
-          ØG<span className="text-brand">Hub</span>
-        </div>
-        {!last && (
-          <Link href="/home" className="press text-xs font-bold text-muted">
-            Skip
-          </Link>
-        )}
-      </div>
+      <div className="h-6" aria-hidden />
 
       <div className="flex-1 flex flex-col items-center justify-center" key={i}>
         <div className="mb-10 animate-scale-in">
@@ -104,7 +95,7 @@ export default function OnboardingPage() {
             href="/home"
             className="magnet group flex w-full bg-brand text-white rounded-full pl-7 pr-2 py-2 items-center justify-between font-bold text-[15px]"
           >
-            Enter the Hub
+            Enter the Universe
             <span className="magnet-icon w-11 h-11 rounded-full bg-white/15 flex items-center justify-center">
               <Icon name="arrow-up-right" size={18} strokeWidth={2.2} />
             </span>
