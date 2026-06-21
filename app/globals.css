@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   ØGHub — Premium flat design system
+   One purple. No gradients. No shadows. Hairline edges. Spring motion.
+   ===================================================================== */
+
+:root {
+  --brand: #6d28d9;          /* the single purple */
+  --brand-press: #5b21b6;    /* darker for active/press */
+  --brand-tint: #f4f0fd;     /* faint fill behind brand elements */
+  --brand-soft: #e7ddf9;     /* hairline accent on hover */
+
+  --ink: #15111f;            /* near-black headings */
+  --body: #3c3550;           /* paragraph text */
+  --muted: #928aa3;          /* secondary text */
+  --line: #ecebf1;           /* default hairline */
+  --line-strong: #e3e0ec;
+
+  --bg: #ffffff;
+  --bg-sunken: #faf9fc;
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-feature-settings: "ss01", "cv01";
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* =====================================================================
+   SURFACES — flat white, hairline border, generous squircle, no shadow
+   ===================================================================== */
+.glass,
+.surface {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+
+.glass-strong,
+.surface-strong {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 26px;
+}
+
+.sunken {
+  background: var(--bg-sunken);
+  border: 1px solid var(--line);
+}
+
+/* Brand helpers — SOLID, never gradient */
+.brand-text { color: var(--brand); }
+.brand-bg { background: var(--brand); }
+
+/* legacy hooks kept flat so untouched markup still looks right */
+.bg-ambient { background: var(--bg); }
+.bg-splash { background: var(--bg); }
+
+/* Eyebrow / micro tag */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: var(--brand-tint);
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+/* =====================================================================
+   KEYFRAMES — transform / opacity only
+   ===================================================================== */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.45); opacity: 0.55; }
+}
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-9px); }
+}
+@keyframes ring-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50%      { transform: scale(1.25); opacity: 0; }
+}
+
+/* =====================================================================
+   ANIMATION UTILITIES
+   ===================================================================== */
+.animate-fade-up   { animation: fade-up 0.6s var(--ease) both; }
+.animate-fade-in   { animation: fade-in 0.5s ease-out both; }
+.animate-slide-right { animation: slide-right 0.5s var(--ease) both; }
+.animate-scale-in  { animation: scale-in 0.5s var(--ease) both; }
+.animate-pulse-dot { animation: pulse-dot 1.7s ease-in-out infinite; }
+.animate-float     { animation: float-soft 6s ease-in-out infinite; }
+.animate-glow-pulse { animation: none; } /* legacy no-op: shadows removed */
+
+/* stagger children entrances */
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.16s; }
+.stagger > *:nth-child(4) { animation-delay: 0.22s; }
+.stagger > *:nth-child(5) { animation-delay: 0.28s; }
+.stagger > *:nth-child(6) { animation-delay: 0.34s; }
+.stagger > *:nth-child(7) { animation-delay: 0.40s; }
+.stagger > *:nth-child(8) { animation-delay: 0.46s; }
+
+/* =====================================================================
+   INTERACTIONS — transform + border only, never shadow
+   ===================================================================== */
+.hover-lift {
+  transition: transform 0.4s var(--ease), border-color 0.3s ease, background-color 0.3s ease;
+  will-change: transform;
+}
+.hover-lift:hover { transform: translateY(-3px); border-color: var(--brand-soft); }
+.hover-lift:active { transform: translateY(-1px) scale(0.992); }
+
+.press {
+  transition: transform 0.35s var(--ease-spring), background-color 0.25s ease;
+}
+.press:active { transform: scale(0.96); }
+
+/* magnetic CTA: inner icon nudges diagonally */
+.magnet .magnet-icon {
+  transition: transform 0.45s var(--ease-spring);
+}
+.magnet:hover .magnet-icon {
+  transform: translate(3px, -3px);
+}
+.magnet:active { transform: scale(0.985); }
+
+.hover-slide-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.3s var(--ease);
+}
+.hover-slide-right:hover { gap: 9px; }
+
+/* subtle light sweep — no shadow involved */
+.hover-shine { position: relative; overflow: hidden; }
+.hover-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.18) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 0.9s var(--ease);
+  pointer-events: none;
+}
+.hover-shine:hover::after { transform: translateX(120%); }
+
+.scroll-hide::-webkit-scrollbar { display: none; }
+.scroll-hide { scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

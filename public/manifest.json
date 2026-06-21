@@ -1,0 +1,24 @@
+{
+  "name": "OrbitØG — The 0G Mainnet in one app",
+  "short_name": "OrbitØG",
+  "description": "Orbit the 0G Labs universe. Live mainnet tracker, wallet insights, ecosystem links, blog & community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafaff",
+  "theme_color": "#6b2fdd",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
