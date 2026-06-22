@@ -22,26 +22,19 @@ Built for the [**Zero Cup** hackathon](https://0g.ai/blog/the-zero-cup).
 - Plus Jakarta Sans
 - Live data from `https://evmrpc.0g.ai`
 
-## Run locally
+Open [OrbitOG Vercel link.](https://orbit-og.vercel.app)
 
-```bash
-npm install
-npm run dev
-```
+## Core Features
 
-Open <http://localhost:3000>.
+1. **Onboarding**	- 3-slide intro with Panda astronaut hero, spring animations, "Enter the Universe" CTA
+2. **Home Feed** - Live blog scraping from 0g.ai/blog, blended with curated Discord/X drops, auto-refreshes every 5 min
+3. **Updates** - Full newsroom with All/Blog/Discord/X filter chips, deep-link to individual post pages
+4. **Community Hub** - 6-card bento: Develop, About 0G, Ecosystem, Learn, Social, Roadmap
+5. **0G Tracker** - Network tab (live block stats, TPS, gas) + Wallet tab (balance, transfers, ERC-20/721 detection)
 
-## Deploy to Vercel
+## Key Decisions & Tradeoffs
 
-1. Push this repo to GitHub
-2. Visit <https://vercel.com/new>, select the repo
-3. Framework preset: **Next.js** (auto-detected)
-4. No env vars needed
-5. Click **Deploy** — first build is ~60 seconds
-
-## API routes
-
-| Route | Source | Notes |
-|---|---|---|
-| `GET /api/network` | `evmrpc.0g.ai` | Aggregated mainnet metrics: block, TPS, gas, fill % |
-| `GET /api/wallet?address=0x…` | `evmrpc.0g.ai` | Balance, tx count, current block for an EVM address |
+- **No RSS Feed from 0g.ai** - 0G Labs doesn't publish an RSS feed. Solution: HTML scraping of the blog listing page with regex extraction for slug, title, and date.
+- **No Public X/Discord API** - No free API for either platform. Solution: maintain a small curated list of significant announcements as static data with real ISO dates — relative timestamps stay accurate as time passes.
+- **hub.0g.ai Analytics API Locked** - The xangle.io-backed analytics API requires private auth. Solution: build /api/network directly from the public evmrpc.0g.ai RPC, and deep-link out to hub.0g.ai for full analytics.
+- **Wallet Staking = Cosmos Layer** - 0G's consensus/staking is Cosmos SDK, not EVM-readable. Solution: show all EVM data (balance, transfers, token/NFT contracts), and provide a deep-link CTA to explorer.0g.ai for staking details.
